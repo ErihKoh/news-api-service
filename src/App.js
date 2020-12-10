@@ -1,25 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import NewsForm from "./components/NewsForm";
+import NewsSearch from "./components/NewsSearch";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  state = {
+    queryForNews: "",
+  };
+
+  handleFormSubmit = (query) => {
+    this.setState({ queryForNews: query });
+  };
+
+  render() {
+    return (
+      <div>
+        <NewsForm onSubmit={this.handleFormSubmit} />
+        <NewsSearch queryForNews={this.state.queryForNews} />
+        <ToastContainer autoClose={2000} />
+      </div>
+    );
+  }
 }
 
 export default App;
