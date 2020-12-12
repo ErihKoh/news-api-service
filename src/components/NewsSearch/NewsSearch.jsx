@@ -1,36 +1,50 @@
 import React, { Component } from "react";
+import NewsView from "../NewsView";
+import NewsError from "../ErrorView";
+import NewsPendingView from "../NewsPendingView";
+import newsApi from "../../services/NewsApi/NewsApi";
 
 class NewsSearch extends Component {
   state = {
     articles: null,
-    loading: false,
+    error: null,
+    status: "idle",
   };
   componentDidUpdate(prevProps, prevState) {
     const prevQuery = prevProps.queryForNews;
     const nextQuery = this.props.queryForNews;
 
     if (prevQuery !== nextQuery) {
-      this.setState({ loading: true });
-      fetch(
-        `https://newsapi.org/v2/everything?q=${nextQuery}&apiKey=4330ebfabc654a6992c2aa792f3173a3`
-      )
-        .then((res) => res.json())
-        .then(({ articles }) => this.setState({ articles }))
-        .finally(() => this.setState({ loading: false }));
+      this.setState({ status: "pending" });
+      newsApi
+        .FetchNews(nextQuery)
+        .then(({ articles }) => this.setState({ articles, status: "resolved" }))
+        .catch((error) => this.setState({ error, status: "rejected" }));
     }
   }
   render() {
-    const { articles, loading } = this.state;
-    const { queryForNews } = this.props;
+    const { articles, error, status } = this.state;
+    // const { queryForNews } = this.props;
 
-    return (
-      <div>
-        {loading && <div>Загружаеm...</div>}
-        <h2>{queryForNews}</h2>
-        {!queryForNews && <div>enter query</div>}
-        {articles && <div>hi</div>}
-      </div>
-    );
+    if (status === "idle") {
+      return <div>enter query</div>;
+    }
+
+    if (status === "pending") {
+      return <NewsPendingView />;
+    }
+
+    if (status === "rejected") {
+      return <NewsError message={error.message} />;
+    }
+
+    if (status === "resolved") {
+      return articles.length !== 0 ? (
+        <NewsView articles={articles} />
+      ) : (
+        <NewsError message="По вашему запросу ничего не найдено" />
+      );
+    }
   }
 }
 
