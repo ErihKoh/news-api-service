@@ -17,7 +17,6 @@ export default function NewsPendingView() {
         <ImSpinner size="32" className="icon-spin" />
         Загружаем...
       </div>
-      <img src={pendingImage} alt="quesion" />
     </div>
   );
 }
